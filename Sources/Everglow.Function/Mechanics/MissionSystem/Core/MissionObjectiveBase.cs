@@ -1,6 +1,6 @@
 using Everglow.Commons.Mechanics.MissionSystem.Abstracts;
 using Everglow.Commons.Mechanics.MissionSystem.Primitives;
-using Everglow.Commons.Mechanics.MissionSystem.Utilities;
+using Everglow.Commons.Utilities;
 using Terraria.ModLoader.IO;
 
 namespace Everglow.Commons.Mechanics.MissionSystem.Core;

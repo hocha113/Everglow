@@ -1,7 +1,7 @@
 using Everglow.Commons.Mechanics.MissionSystem.Core;
 using Everglow.Commons.Mechanics.MissionSystem.Primitives;
 using Everglow.Commons.Mechanics.MissionSystem.Shared.Icons;
-using Everglow.Commons.Mechanics.MissionSystem.Utilities;
+using Everglow.Commons.Utilities;
 
 namespace Everglow.Commons.Mechanics.MissionSystem.Objectives;
 

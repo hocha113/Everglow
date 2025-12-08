@@ -1,4 +1,4 @@
-namespace Everglow.Commons.Mechanics.MissionSystem.Utilities;
+namespace Everglow.Commons.Utilities;
 
 public static class AssetUtils
 {

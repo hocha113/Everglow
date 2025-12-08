@@ -2,7 +2,7 @@ using Everglow.Commons.Mechanics.MissionSystem.Core;
 using Everglow.Commons.Mechanics.MissionSystem.Hooks;
 using Everglow.Commons.Mechanics.MissionSystem.Primitives;
 using Everglow.Commons.Mechanics.MissionSystem.Shared.Icons;
-using Everglow.Commons.Mechanics.MissionSystem.Utilities;
+using Everglow.Commons.Utilities;
 using Terraria.ModLoader.IO;
 
 namespace Everglow.Commons.Mechanics.MissionSystem.Objectives;

@@ -4,7 +4,7 @@ namespace Everglow.Commons.Utilities;
 
 public class TagCompoundUtils
 {
-	public class KeyValuePairIntIntSerializer : TagSerializer<KeyValuePair<int, int>, TagCompound>
+	public class KeyValuePairSerializer_Int_Int : TagSerializer<KeyValuePair<int, int>, TagCompound>
 	{
 		private const string Key = nameof(Key);
 		private const string Value = nameof(Value);
