@@ -1,5 +1,5 @@
 using Everglow.Commons.Mechanics.MissionSystem.Enums;
-using Everglow.Commons.Mechanics.MissionSystem.Utilities;
+using Everglow.Commons.Mechanics.MissionSystem.Shared;
 using Everglow.Commons.UI.UIElements;
 using Everglow.Commons.Utilities;
 using Everglow.Commons.Vertex;
@@ -16,9 +16,9 @@ public class UIMissionBackground : UIBlock
 
 	private float chainMovement = 0;
 
-	private Color PoolTypeColor => MissionColorUtils.GetPoolTypeColor(poolType);
+	private Color PoolTypeColor => MissionColorDefinition.GetPoolTypeColor(poolType);
 
-	private Color MissionTypeColor => MissionColorUtils.GetMissionTypeColor(missionType);
+	private Color MissionTypeColor => MissionColorDefinition.GetMissionTypeColor(missionType);
 
 	public void SetSpectrumColor(PoolType? poolType, MissionType? missionType)
 	{

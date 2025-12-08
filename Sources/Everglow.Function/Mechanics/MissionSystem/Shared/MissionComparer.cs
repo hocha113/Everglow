@@ -1,7 +1,7 @@
 using Everglow.Commons.Mechanics.MissionSystem.Core;
 using Everglow.Commons.Mechanics.MissionSystem.Enums;
 
-namespace Everglow.Commons.Mechanics.MissionSystem.Utilities;
+namespace Everglow.Commons.Mechanics.MissionSystem.Shared;
 
 public class MissionComparer : IComparer<MissionBase>
 {

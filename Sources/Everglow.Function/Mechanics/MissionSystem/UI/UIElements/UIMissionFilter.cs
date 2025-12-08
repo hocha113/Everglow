@@ -1,7 +1,7 @@
 using Everglow.Commons.DataStructures;
 using Everglow.Commons.Mechanics.MissionSystem.Core;
 using Everglow.Commons.Mechanics.MissionSystem.Enums;
-using Everglow.Commons.Mechanics.MissionSystem.Utilities;
+using Everglow.Commons.Mechanics.MissionSystem.Shared;
 using Everglow.Commons.UI.UIElements;
 using Everglow.Commons.Utilities;
 
@@ -443,9 +443,9 @@ public class UIMissionFilter : BaseElement
 		// StarEffect_Outer
 		var star = ModAsset.StarSlash.Value;
 		var star_dark = ModAsset.StarSlash_black.Value;
-		var starColor = MissionColorUtils.GetMissionTypeColor(MissionTypeValue);
+		var starColor = MissionColorDefinition.GetMissionTypeColor(MissionTypeValue);
 		starColor.A = 0;
-		var star_darkColor = MissionColorUtils.GetMissionTypeColor(MissionTypeValue);
+		var star_darkColor = MissionColorDefinition.GetMissionTypeColor(MissionTypeValue);
 		star_darkColor = new Color(star_darkColor.A, star_darkColor.A, star_darkColor.A, star_darkColor.A);
 		if (!SpectrumBlockedAtOuter)
 		{
@@ -459,9 +459,9 @@ public class UIMissionFilter : BaseElement
 		}
 
 		// StarEffect_Inner
-		starColor = MissionColorUtils.GetPoolTypeColor(PoolTypeValue);
+		starColor = MissionColorDefinition.GetPoolTypeColor(PoolTypeValue);
 		starColor.A = 0;
-		star_darkColor = MissionColorUtils.GetPoolTypeColor(PoolTypeValue);
+		star_darkColor = MissionColorDefinition.GetPoolTypeColor(PoolTypeValue);
 		star_darkColor = new Color(star_darkColor.A, star_darkColor.A, star_darkColor.A, star_darkColor.A);
 		if (!SpectrumBlockedAtInner)
 		{

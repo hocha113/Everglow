@@ -1,12 +1,12 @@
 using Everglow.Commons.Mechanics.MissionSystem.Core;
 using Everglow.Commons.Mechanics.MissionSystem.Enums;
-using Everglow.Commons.Mechanics.MissionSystem.Utilities;
 using Everglow.Commons.UI;
 using Everglow.Commons.UI.UIElements;
 using Everglow.Commons.Vertex;
 using Terraria.GameContent;
 using UIImage = Everglow.Commons.UI.UIElements.UIImage;
 using static Everglow.Commons.Mechanics.MissionSystem.UI.MissionContainer;
+using Everglow.Commons.Mechanics.MissionSystem.Shared;
 
 namespace Everglow.Commons.Mechanics.MissionSystem.UI.UIElements;
 
@@ -194,7 +194,7 @@ public class UIMissionItem : UIBlock
 		var width = 15 * MissionContainer.Scale;
 		var y1 = 12 * MissionContainer.Scale;
 		var y2 = 36 * MissionContainer.Scale;
-		var startColor = MissionColorUtils.GetMissionTypeColor(Mission.MissionType) * 0.4f;
+		var startColor = MissionColorDefinition.GetMissionTypeColor(Mission.MissionType) * 0.4f;
 		var endColor = Color.Transparent;
 		var vertices = new List<Vertex2D>();
 		{

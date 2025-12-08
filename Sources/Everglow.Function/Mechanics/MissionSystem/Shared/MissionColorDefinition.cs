@@ -1,8 +1,8 @@
 using Everglow.Commons.Mechanics.MissionSystem.Enums;
 
-namespace Everglow.Commons.Mechanics.MissionSystem.Utilities;
+namespace Everglow.Commons.Mechanics.MissionSystem.Shared;
 
-public static class MissionColorUtils
+public static class MissionColorDefinition
 {
 	public static readonly Color InitialLightColor = new Color(1f, 1f, 1f, 0f) * 0.8f;
 
