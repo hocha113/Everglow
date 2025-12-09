@@ -13,16 +13,20 @@ public class MissionPlayer : ModPlayer
 
 	public static event Action<Item> GlobalOnPickupEvent;
 
-	private MissionManager.MissionManagerInfo missionInfo;
+	private MissionManagerData missionManagerData;
 
-	private bool initialMissionInfoLoaded = false;
+	/// <summary>
+	/// Indicate to apply player mission info into <see cref="MissionManager"/>. Defaults to <c>false</c>.
+	/// <br/>Set to <c>true</c> after data applying, to <c>false</c> after player loading.
+	/// </summary>
+	private bool missionManagerDataInitialized = false;
 
 	public override void OnEnterWorld()
 	{
-		if (!initialMissionInfoLoaded) // Prevent load being called when on enter world is called by subworldlibrary
+		if (!missionManagerDataInitialized) // Prevent load being called when OnEnterWorld is called by subworldlibrary
 		{
-			MissionManager.LoadPlayerInfo(missionInfo);
-			initialMissionInfoLoaded = true;
+			MissionManager.ApplyData(missionManagerData);
+			missionManagerDataInitialized = true;
 		}
 
 #if DEBUG
@@ -54,8 +58,8 @@ public class MissionPlayer : ModPlayer
 
 	public override void LoadData(TagCompound tag)
 	{
-		missionInfo = MissionManager.LoadData(tag);
-		initialMissionInfoLoaded = false;
+		missionManagerData = MissionManager.LoadData(tag);
+		missionManagerDataInitialized = false;
 	}
 
 	public override bool OnPickup(Item item)

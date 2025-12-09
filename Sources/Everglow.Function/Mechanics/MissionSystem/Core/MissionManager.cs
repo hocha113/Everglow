@@ -16,6 +16,11 @@ public static class MissionManager
 	private static Dictionary<PoolType, List<MissionBase>> _missionPools;
 
 	/// <summary>
+	/// 历史杀怪计数
+	/// </summary>
+	private static Dictionary<int, int> _nPCKillCounter;
+
+	/// <summary>
 	/// 已接受任务的任务池
 	/// </summary>
 	private static List<MissionBase> AcceptedMissionPool => _missionPools[PoolType.Accepted];
@@ -23,7 +28,7 @@ public static class MissionManager
 	/// <summary>
 	/// 历史杀怪计数
 	/// </summary>
-	public static Dictionary<int, int> NPCKillCounter { get; private set; }
+	public static Dictionary<int, int> NPCKillCounter => _nPCKillCounter;
 
 	/// <summary>
 	/// 任务列表是否需要更新
@@ -35,7 +40,7 @@ public static class MissionManager
 		if (!Main.dedServ)
 		{
 			_missionPools = [];
-			NPCKillCounter = [];
+			_nPCKillCounter = [];
 
 			foreach (var missionPoolType in Enum.GetValues<PoolType>())
 			{
@@ -43,8 +48,8 @@ public static class MissionManager
 			}
 
 			Main.OnTickForInternalCodeOnly += Update;
-			Player.Hooks.OnEnterWorld += ClearAllEvents;
 			MissionPlayer.OnKillNPCEvent += MissionPlayer_OnKillNPC_CountKill;
+			Ins.HookManager.AddHook(Commons.Enums.CodeLayer.PostSaveAndQuit, Clear);
 		}
 	}
 
@@ -53,15 +58,11 @@ public static class MissionManager
 		if (!Main.dedServ)
 		{
 			_missionPools = null;
-			NPCKillCounter = null;
-
-			Main.OnTickForInternalCodeOnly -= Update;
-			Player.Hooks.OnEnterWorld -= ClearAllEvents;
-			MissionPlayer.OnKillNPCEvent -= MissionPlayer_OnKillNPC_CountKill;
+			_nPCKillCounter = null;
 		}
 	}
 
-	public static void ClearAllEvents(Player player)
+	public static void ClearAllEvents()
 	{
 		foreach (var m in _missionPools.SelectMany(x => x.Value))
 		{
@@ -339,8 +340,8 @@ public static class MissionManager
 	/// </summary>
 	public static void Clear()
 	{
-		ClearAllEvents(null);
-		NPCKillCounter.Clear();
+		ClearAllEvents();
+		_nPCKillCounter.Clear();
 		foreach (var (_, missionPool) in _missionPools)
 		{
 			missionPool.Clear();
@@ -360,19 +361,41 @@ public static class MissionManager
 		}
 
 		// Update NPC kill history
-		if (!NPCKillCounter.TryAdd(npc.type, 1))
+		if (!_nPCKillCounter.TryAdd(npc.type, 1))
 		{
-			NPCKillCounter[npc.type]++;
+			_nPCKillCounter[npc.type]++;
 		}
 	}
 
+	#region Data Persistance
+
 	/// <summary>
-	/// 保存任务
+	/// Initialize mission manager with player mission data
 	/// </summary>
-	/// <param name="tag"></param>
+	/// <param name="data"></param>
+	public static void ApplyData(MissionManagerData data)
+	{
+		if (data == null)
+		{
+			return;
+		}
+
+		Clear();
+
+		_nPCKillCounter = data.NPCKillCounter.ToDictionary();
+		_missionPools = data.MissionPools.ToDictionary();
+
+		AcceptedMissionPool.ForEach(x => x.Activate());
+	}
+
+	/// <summary>
+	/// Save missions to player file data.
+	/// <br/>Should only be called by <see cref="ModPlayer.SaveData(TagCompound)"/>.
+	/// </summary>
+	/// <param name="tag">Provided by <see cref="ModPlayer.SaveData(TagCompound)"/>.</param>
 	public static void SaveData(TagCompound tag)
 	{
-		tag.Add(nameof(NPCKillCounter), NPCKillCounter.ToList());
+		tag.Add(nameof(_nPCKillCounter), _nPCKillCounter.ToList());
 
 		foreach (var (poolType, missionPool) in _missionPools)
 		{
@@ -391,83 +414,54 @@ public static class MissionManager
 	}
 
 	/// <summary>
-	/// 加载任务
+	/// Load missions from player file data.
+	/// <br/>Should only be called by <see cref="ModPlayer.LoadData(TagCompound)"/>.
 	/// </summary>
-	/// <param name="tag"></param>
-	public static MissionManagerInfo LoadData(TagCompound tag)
+	/// <param name="tag">Provided by <see cref="ModPlayer.LoadData(TagCompound)"/>.</param>
+	public static MissionManagerData LoadData(TagCompound tag)
 	{
-		NPCKillCounter.Clear();
-		tag.TryGet<List<KeyValuePair<int, int>>>(nameof(NPCKillCounter), out var nPCKillCounter);
-		if (nPCKillCounter != null && nPCKillCounter.Count > 0)
+		// Load npc kill counter.
+		var nPCKillCounter = new Dictionary<int, int>();
+		tag.TryGet<List<KeyValuePair<int, int>>>(nameof(NPCKillCounter), out var nPCKillCounterStorage);
+		if (nPCKillCounterStorage != null && nPCKillCounterStorage.Count > 0)
 		{
-			NPCKillCounter = nPCKillCounter.ToDictionary();
+			nPCKillCounter = nPCKillCounterStorage.ToDictionary();
 		}
 
-		foreach (var (poolType, missionPool) in _missionPools)
+		// Load missions.
+		var missionPools = new Dictionary<PoolType, List<MissionBase>>();
+		foreach (var missionPoolType in Enum.GetValues<PoolType>())
 		{
-			missionPool.Clear();
+			missionPools.Add(missionPoolType, []);
+		}
 
+		foreach (var (poolType, missionPool) in missionPools)
+		{
 			string poolTypeKey = $"Everglow.MissionManage.{poolType}.Type";
 			string poolMissionKey = $"Everglow.MissionManage.{poolType}.Missions";
-			if (tag.TryGet<IList<string>>(poolTypeKey, out var mt) &&
-				tag.TryGet<IList<TagCompound>>(poolMissionKey, out var m))
+			if (tag.TryGet<IList<string>>(poolTypeKey, out var missionTypes)
+				&& tag.TryGet<IList<TagCompound>>(poolMissionKey, out var missions))
 			{
-				for (int j = 0; j < mt.Count; j++)
+				for (int i = 0; i < missionTypes.Count; i++)
 				{
-					var type = Ins.ModuleManager.Types.FirstOrDefault(t => t.FullName == mt[j]);
-					var mission = Activator.CreateInstance(type) as MissionBase;
-					mission.LoadData(m[j]);
-					missionPool.Add(mission);
-					mission.PoolType = poolType;
+					var type = Ins.ModuleManager.Types.FirstOrDefault(t => t.FullName == missionTypes[i]);
+					if (type != null
+						&& Activator.CreateInstance(type) is MissionBase m)
+					{
+						m.LoadData(missions[i]);
+						missionPool.Add(m);
+						m.PoolType = poolType;
+					}
+					else
+					{
+						Ins.Logger.Warn($"Invalid type {missionTypes[i]} detected from player file.");
+					}
 				}
 			}
 		}
 
-		return MissionManagerInfo.Create();
+		return new MissionManagerData(nPCKillCounter, missionPools);
 	}
 
-	/// <summary>
-	/// Initialize mission manager with player mission pool data
-	/// </summary>
-	/// <param name="poolData"></param>
-	public static void LoadPlayerInfo(MissionManagerInfo info)
-	{
-		ClearAllEvents(null);
-		Clear();
-
-		if (info != null)
-		{
-			NPCKillCounter = info.NPCKillCounter;
-			_missionPools = info.MissionPools;
-			AcceptedMissionPool.ForEach(x => x.Activate());
-		}
-	}
-
-	public class MissionManagerInfo
-	{
-		public Dictionary<int, int> NPCKillCounter { get; private set; }
-
-		public Dictionary<PoolType, List<MissionBase>> MissionPools { get; private set; }
-
-		public MissionManagerInfo()
-		{
-			NPCKillCounter = [];
-			MissionPools = [];
-		}
-
-		public static MissionManagerInfo Create()
-		{
-			var info = new MissionManagerInfo
-			{
-				NPCKillCounter = MissionManager.NPCKillCounter.ToDictionary(), // Create a copy of the kill counter.
-			};
-
-			foreach (var (type, pool) in _missionPools)
-			{
-				info.MissionPools.Add(type, [.. pool]);
-			}
-
-			return info;
-		}
-	}
+	#endregion
 }
