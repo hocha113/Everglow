@@ -28,7 +28,7 @@ public static class MissionManager
 	/// <summary>
 	/// 历史杀怪计数
 	/// </summary>
-	public static Dictionary<int, int> NPCKillCounter => _nPCKillCounter;
+	public static IReadOnlyDictionary<int, int> NPCKillCounter => _nPCKillCounter;
 
 	/// <summary>
 	/// 任务列表是否需要更新
