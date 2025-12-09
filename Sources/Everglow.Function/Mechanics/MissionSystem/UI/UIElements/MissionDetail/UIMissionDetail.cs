@@ -369,6 +369,7 @@ public class UIMissionDetail : UIBlock
 	{
 		if (SelectedItem != null
 			&& SelectedItem.Mission.PoolType == PoolType.Accepted
+			&& SelectedItem.Mission.Cancellable
 			&& !SelectedItem.Mission.CheckComplete())
 		{
 			MissionManager.MoveMission(SelectedItem.Mission, PoolType.Accepted, PoolType.Failed);

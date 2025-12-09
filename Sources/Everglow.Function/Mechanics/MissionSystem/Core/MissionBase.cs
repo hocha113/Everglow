@@ -178,6 +178,11 @@ public abstract class MissionBase : ITagCompoundEntity
 	public virtual bool AutoComplete => false;
 
 	/// <summary>
+	/// 是否可放弃任务
+	/// </summary>
+	public virtual bool Cancellable => false;
+
+	/// <summary>
 	/// 任务可提交状态的旧状态
 	/// <para/>该属性不需要持久化，保证每次重新进入世界时都会发送信息
 	/// </summary>
