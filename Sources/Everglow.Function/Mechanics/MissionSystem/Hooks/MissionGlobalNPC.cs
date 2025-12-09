@@ -1,11 +1,14 @@
 using Everglow.Commons.Mechanics.MissionSystem.Core;
 using Everglow.Commons.Mechanics.MissionSystem.Enums;
 using Everglow.Commons.Mechanics.MissionSystem.Objectives;
+using Everglow.Commons.Utilities;
 
 namespace Everglow.Commons.Mechanics.MissionSystem.Hooks;
 
 public class MissionGlobalNPC : GlobalNPC
 {
+	public static event Action<NPC> OnKillNPCEvent;
+
 	/// <summary>
 	/// On kill hook for multiplayer missions
 	/// </summary>
@@ -21,6 +24,16 @@ public class MissionGlobalNPC : GlobalNPC
 		{
 			ServerOnKill(npc);
 		}
+	}
+
+	public override bool SpecialOnKill(NPC npc)
+	{
+		if (npc.lastInteraction == Main.myPlayer && !NetUtils.IsServer)
+		{
+			OnKillNPCEvent?.Invoke(npc);
+		}
+
+		return base.SpecialOnKill(npc);
 	}
 
 	public void ClientOnKill(NPC npc)

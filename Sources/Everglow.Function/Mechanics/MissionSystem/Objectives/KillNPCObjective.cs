@@ -66,12 +66,12 @@ public class KillNPCObjective : MissionObjectiveBase
 
 	public override void Activate(MissionBase sourceMission)
 	{
-		MissionPlayer.OnKillNPCEvent += MissionPlayer_OnKillNPC;
+		MissionGlobalNPC.OnKillNPCEvent += MissionPlayer_OnKillNPC;
 	}
 
 	public override void Deactivate()
 	{
-		MissionPlayer.OnKillNPCEvent -= MissionPlayer_OnKillNPC;
+		MissionGlobalNPC.OnKillNPCEvent -= MissionPlayer_OnKillNPC;
 	}
 
 	/// <summary>

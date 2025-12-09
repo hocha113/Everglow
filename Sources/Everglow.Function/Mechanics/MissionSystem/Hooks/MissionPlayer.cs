@@ -7,8 +7,6 @@ namespace Everglow.Commons.Mechanics.MissionSystem.Hooks;
 
 public class MissionPlayer : ModPlayer
 {
-	public static event Action<NPC> OnKillNPCEvent;
-
 	public static event Action<Item> OnPickupEvent;
 
 	public static event Action<Item> GlobalOnPickupEvent;
@@ -72,18 +70,6 @@ public class MissionPlayer : ModPlayer
 		GlobalOnPickupEvent?.Invoke(item);
 
 		return true;
-	}
-
-	public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-	{
-		if (Player.whoAmI == Main.myPlayer)
-		{
-			// If player killed this npc
-			if (!target.active)
-			{
-				OnKillNPCEvent?.Invoke(target);
-			}
-		}
 	}
 
 	public override void OnConsumeAmmo(Item weapon, Item ammo)

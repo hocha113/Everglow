@@ -46,8 +46,8 @@ public static class MissionManager
 			_nPCKillCounter = [];
 
 			Main.OnTickForInternalCodeOnly += Update;
-			MissionPlayer.OnKillNPCEvent += MissionPlayer_OnKillNPC_CountKill;
 			Ins.HookManager.AddHook(Commons.Enums.CodeLayer.PostSaveAndQuit, Clear);
+			MissionGlobalNPC.OnKillNPCEvent += MissionPlayer_OnKillNPC_CountKill;
 		}
 	}
 
@@ -57,6 +57,7 @@ public static class MissionManager
 		{
 			_missionPools = null;
 			_nPCKillCounter = null;
+			MissionGlobalNPC.OnKillNPCEvent -= MissionPlayer_OnKillNPC_CountKill;
 		}
 	}
 
