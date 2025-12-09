@@ -47,7 +47,7 @@ public static class MissionManager
 
 			Main.OnTickForInternalCodeOnly += Update;
 			Ins.HookManager.AddHook(Commons.Enums.CodeLayer.PostSaveAndQuit, Clear);
-			MissionGlobalNPC.OnKillNPCEvent += MissionPlayer_OnKillNPC_CountKill;
+			MissionGlobalNPC.OnKillNPCEvent += MissionGlobalNPC_SpecialOnKill_CountKill;
 		}
 	}
 
@@ -57,7 +57,7 @@ public static class MissionManager
 		{
 			_missionPools = null;
 			_nPCKillCounter = null;
-			MissionGlobalNPC.OnKillNPCEvent -= MissionPlayer_OnKillNPC_CountKill;
+			MissionGlobalNPC.OnKillNPCEvent -= MissionGlobalNPC_SpecialOnKill_CountKill;
 		}
 	}
 
@@ -158,7 +158,7 @@ public static class MissionManager
 	/// </summary>
 	/// <param name="npc">被击杀的NPC</param>
 	/// <exception cref="InvalidParameterException">参数为空或npc类型错误</exception>
-	public static void MissionPlayer_OnKillNPC_CountKill(NPC npc)
+	public static void MissionGlobalNPC_SpecialOnKill_CountKill(NPC npc)
 	{
 		if (npc.type <= NPCID.None)
 		{
